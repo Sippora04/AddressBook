@@ -3,107 +3,49 @@ import java.util.*;
 
 public class AddressBookManager
 { 
-    public static void main(String[] args) throws IOException
+    public static void main(String[] args) throws IOException, Exception
     {   
         AddressBook addressbook = new AddressBook();
+        addressbook.readData();
         Scanner sc = new Scanner(System.in);
-        System.out.println("\nEnter 'y' to continue with the AddressBook " );
-        String choice = "y";        
-        String ch = sc.nextLine();
-        while( choice.equals(ch) )
+        
+        System.out.println("\n\t\t Welcome to Address Book");
+        int check = 1;
+        while( check != 0 )
         {        	
-            System.out.println("1 ===> Add New Record ");
-            System.out.println("2 ===> View All Record ");	
+            System.out.println("1 ===> Add Record ");
+            System.out.println("2 ===> View Record ");	
             System.out.println("3 ===> Delete Record ");
             System.out.println("4 ===> Search Record ");
-            System.out.println("5 ===> Update Record ");	        
+            System.out.println("5 ===> Update Record ");
+            System.out.println("6 ===> Sort Record ");
+            System.out.println("7 ===> Save Record");
 	    
             System.out.println("\n Enter your choice: ");
-            choice = sc.nextLine();
+            int choice = sc.nextInt();
             switch(choice)
             {
-                case "1": AddressBook.getAddRecord();
-                        break;
-                case "2": AddressBook.getViewAllRecord();
-                        break;
-                case "3": AddressBook.getDeleteRecordByID();
-                        break;
-                case "4": AddressBook.getSearchRecordbyID();
-                        break;
-                case "5": AddressBook.getupdateRecordbyID();
-                        break;
+                case 1: addressbook.getAddRecord();
+                          break;
+                case 2: addressbook.getViewAllRecord();
+                          break;
+                case 3: addressbook.getDeleteRecord();
+                          break;
+                case 4: addressbook.getSearchRecord();
+                          break;
+                case 5: addressbook.getupdateRecord();
+                          break;
+                case 6: addressbook.getSortRecord();
+                          break;
+                case 7: addressbook.getSaveRecord();
+                          break;
+
+                default: System.exit(0);
             }
-            System.out.println("Do you want to continue? 'y/n'");
-            choice = sc.nextLine();
+            System.out.println("\n\t\t Do you want to continue? 'Press 1' or  for exit 'Press 0' ");
+            check = sc.nextInt();
         }
     }
 }
 
-/*
-$ java AddressBookManager
 
-Enter 'y' to continue with the AddressBook
-y
-1 ===> Add New Record
-2 ===> View All Record
-3 ===> Delete Record
-4 ===> Search Record
-5 ===> Update Record
-
- Enter your choice:
-1
-Enter the Employee ID: 101
-Enter the Employee Name: Sippora
-Enter the Employee Age: 12
-Enter the Employee Address: Delhi
-Do you want to continue? 'y/n'
-y
-1 ===> Add New Record
-2 ===> View All Record
-3 ===> Delete Record
-4 ===> Search Record
-5 ===> Update Record
-
- Enter your choice:
-5
-                 Update Employee Record
-
-
-Enter the Employee ID:
-101
- -------------------------------------------------------------
-|       ID              Name                            Age                     Address                   |
- -------------------------------------------------------------
-|       101     Sippora                 12                      Delhi      |
-|                                                                 |
- -------------------------------------------------------------
-Enter the new Name:
-Sippora Toppo
-Enter the new Age:
-12
-Enter the new Address:
-New Delhi
-true
-Do you want to continue? 'y/n'
-y
-1 ===> Add New Record
-2 ===> View All Record
-3 ===> Delete Record
-4 ===> Search Record
-5 ===> Update Record
-
- Enter your choice:
-4
-                 Search Employee Record
-
-Enter the Employee ID:
-101
- -------------------------------------------------------------
-|       ID              Name                            Age                     Address                   |
- -------------------------------------------------------------
-|       101     Sippora Toppo           12                      New Delhi      |
-|                                                                 |
- -------------------------------------------------------------
-Do you want to continue? 'y/n'
-n
-*/

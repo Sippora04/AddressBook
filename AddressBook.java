@@ -1,184 +1,204 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Scanner;
-import java.util.StringTokenizer;
+import java.util.ArrayList;
+import java.io.IOException;
+import java.io.FileWriter;
+import java.io.*;
 
-public class AddressBook 
+public class AddressBook
 {
-    public static void getAddRecord() throws IOException 
-    {
-        try (BufferedWriter bw = new BufferedWriter( new FileWriter("Address_Book.txt",true) ))
+
+	private ArrayList<Person> personArray;
+	private int numberOfPerson = 0;
+	public Scanner sc = new Scanner( System.in );
+
+	public AddressBook()
+        {
+            personArray = new ArrayList<>();
+	}
+
+	public void readData()throws Exception
+	{
+		try
+		{
+			   FileInputStream fstream = new FileInputStream("Address_Book.txt");
+    			DataInputStream in = new DataInputStream(fstream);
+    			BufferedReader br = new BufferedReader(new InputStreamReader(in));
+    			String data;
+    			while ((data = br.readLine()) != null)
+			   {
+					String[] tmp = data.split("\t");    
+					Person person = new Person( tmp[0], tmp[1], Long.parseLong(tmp[2]), tmp[3], tmp[4], Integer.parseInt(tmp[5]));
+					personArray.add(person);
+    			}
+		}
+		catch (Exception ex)
+			{
+				System.out.println("File not exist.");
+			}
+	}
+
+
+	public Person getUserInput()
+	{   String firstName,lastName,address,state;
+            int pinCode;
+            long phoneNumber;
+
+            System.out.print("\n Enter Person First Name: ");
+            firstName = sc.next();
+            System.out.print("Enter Person Last Name: ");
+            lastName = sc.next();
+            System.out.print("Enter the Phone Number: ");
+            phoneNumber = sc.nextLong();
+            System.out.print("Enter Address: ");
+            address = sc.next();
+            System.out.print("Enter State: ");
+            state = sc.next();
+            System.out.print("Enter the Pincode: ");
+            pinCode = sc.nextInt();
+            Person person = new Person( firstName, lastName, phoneNumber, address, state, pinCode);
+            return person;
+	}
+
+	public void getAddRecord()
+        {
+            Person person = getUserInput();
+            personArray.add(person);
+            numberOfPerson++;
+	}
+
+	public int getPersonIndex(String name)
+        {
+            int count = 0;
+            while(count < personArray.size())
             {
-                Scanner sc = new Scanner(System.in);
-                String ID, name, age, addr;
-                System.out.print("Enter the Employee ID: ");
-                ID = sc.nextLine();
-                System.out.print("Enter the Employee Name: ");
-                name = sc.nextLine();
-                System.out.print("Enter the Employee Age: ");
-                age = sc.nextLine();
-                System.out.print("Enter the Employee Address: ");
-                addr = sc.nextLine();
-                bw.write(ID+","+name+","+age+","+addr);
-                bw.flush();
-                bw.newLine();
+                if((personArray.get(count).firstName).equals(name))
+                    {
+                        return count;
+                    }
+                count++;
             }
-        catch(Exception e )
+            return count;
+	}
+
+	public void getupdateRecord()
+        {
+            System.out.println("\n Enter person name you want to update: ");
+            String name = sc.next();
+            int count = 0;
+            count = getPersonIndex(name);
+            if (count < personArray.size())
             {
-                System.out.println("Incorrect added");
+                personArray.get(count).readEntry();
+                Person person = getUserInput();
+                personArray.set(count, person);
+                System.out.print( "\nFIRSTNAME\tLASTNAME\tPHONE_NUMBER\tADDRESS\t\tSTATE\t\tPINCODE\n" );
+                personArray.get(count).readEntry();
+                return;
             }
-    }
-    
-   public static void getViewAllRecord() throws IOException 
-    {
-        try (BufferedReader br = new BufferedReader( new FileReader("Address_Book.txt") )) 
+            System.out.println("Required Contact Missing");
+        }
+
+	public void getViewAllRecord()
         {
-            String[] record = new String[50];
-            System.out.println(" ------------------------------------------------------------- ");
-            System.out.println("|	ID		Name 				Age			Address 		  |");
-            System.out.println(" ------------------------------------------------------------- ");
-            int i = 0; 
-            while( (record[i] = br.readLine()) != null )
+			System.out.print( "\nFIRSTNAME\tLASTNAME\tPHONE_NUMBER\tADDRESS\t\tSTATE\t\tPINCODE\n" );
+            for (int i=0; i<personArray.size(); i++)
             {
-                StringTokenizer st = new StringTokenizer(record[i],",");
-                System.out.println("|	"+st.nextToken()+"	"+st.nextToken()+" 		"+st.nextToken()+"			"+st.nextToken()+"      |");
-                i++;
+                System.out.println();
+                personArray.get(i).readEntry();
             }
-            System.out.println("|	                                            	          |");
-            System.out.println(" ------------------------------------------------------------- ");
-        }
-        catch ( Exception e )
+	}
+
+	public void getDeleteRecord()
         {
-            System.out.println("Something is wrong");
-        }
-    }
-    
-    public static void getDeleteRecordByID() throws IOException
-    {
-        Scanner sc =  new Scanner(System.in);
-    	String ID, record;
-    	File tempDB = new File("Address_Book_temp.txt");
-    	File db = new File("Address_Book.txt");
-        BufferedWriter bw = null;
-        try (BufferedReader br = new BufferedReader( new FileReader( db ))) 
-        {
-            bw = new BufferedWriter( new FileWriter( tempDB ) );
-            System.out.println("\t\t Delete Employee Record\n");
-            System.out.println("Enter the Employee ID: ");
-            ID =  sc.nextLine();
-            while( ( record = br.readLine() ) != null )
+            System.out.println("\n Enter the first name of person you want to Delete: ");
+            String name = sc.next();
+            int count = 0;
+            count = getPersonIndex(name);
+            if (count < personArray.size())
             {
-                if( record.contains(ID) )
-                    continue;
-                bw.write(record);
-                bw.flush();
-                bw.newLine();
-                
+                personArray.remove(count);
+                System.out.println("Person contact deleted");
+			return;
+            }
+            System.out.println("Required Contact Missing");
+	}
+
+	public void sort(int sortBy)
+        {
+            for (int i = 0; i<personArray.size(); i++)
+            {
+                for (int j = 0; j<personArray.size(); j++)
+				{
+                    switch(sortBy)
+                    {
+                        case 1: if (personArray.get(i).firstName.compareToIgnoreCase(personArray.get(j).firstName)<0)
+                                {
+                                    Person temp = personArray.get(i);
+                                    personArray.set(i, personArray.get(j));
+                                    personArray.set(j, temp);
+									System.out.print( "FIRSTNAME\tLASTNAME\tPHONE_NUMBER\tADDRESS\t\tSTATE\t\tPINCODE\n" );
+                                    personArray.get(i).readEntry();
+                                    //personArray.get(j).readEntry();
+                                }
+								break;
+                        case 2: if ( personArray.get(i).pinCode < personArray.get(j).pinCode)
+                                {
+                                    Person temp = personArray.get(i);
+                                    personArray.set(i, personArray.get(j));
+                                    personArray.set(j, temp);
+ 									System.out.print( "FIRSTNAME\tLASTNAME\tPHONE_NUMBER\tADDRESS\t\tSTATE\t\tPINCODE\n" );
+                                    personArray.get(i).readEntry();
+                                    //personArray.get(j).readEntry();
+                                }
+								break;
+                    }
+				}
             }
         }
-        catch (Exception e)
+
+	public void getSortRecord()
+	{
+            System.out.println("\nEnter for sorting by Name or by PinCode :");
+            int sortBy = 0;
+            System.out.println(" 1)Name\n 2)Pincode");
+            sortBy = sc.nextInt();
+            sort(sortBy);
+	}
+        
+        public void getSearchRecord() throws IOException 
         {
-            System.out.println("Error in Delete");
-        }
-            bw.close();
-            db.delete();
-            tempDB.renameTo(db);
- 
-    }
-    public static void getSearchRecordbyID() throws IOException 
-    {
-        String ID,record;
-    	Scanner strInput = new Scanner(System.in);
-        try (BufferedReader br = new BufferedReader( new FileReader("Address_Book.txt") ))
-        {
-            System.out.println("\t\t Search Employee Record\n");
-            System.out.println("Enter the Employee ID: ");
-            ID = strInput.nextLine();
-            System.out.println(" ------------------------------------------------------------- ");
-            System.out.println("|	ID		Name 				Age			Address 		  |");
-            System.out.println(" ------------------------------------------------------------- ");
-            while( ( record = br.readLine() ) != null )
+            String name;
+            Scanner strInput = new Scanner(System.in);
             {
-                StringTokenizer st = new StringTokenizer(record,",");
-                if( record.contains(ID) )
+                System.out.println("\n Enter person name you want to search : ");
+                name = strInput.nextLine();
+                int count = 0;
+                count = getPersonIndex(name);
+                for (Person personArray1 : personArray)
                 {
-                    System.out.println("|	"+st.nextToken()+"	"+st.nextToken()+" 		"+st.nextToken()+"			"+st.nextToken()+"      |");
+                    if (count < personArray.size())
+                    {   
+						System.out.print( "FIRSTNAME\tLASTNAME\tPHONE_NUMBER\tADDRESS\t\tSTATE\t\tPINCODE\n" );
+                        personArray.get(count).readEntry();
+                        break;
+                    }
+                    System.out.println("\n Contact Missing");    
                 }
             }
-            System.out.println("|	                                            	          |");
-            System.out.println(" ------------------------------------------------------------- ");
         }
-        catch (Exception e )
-        {
-            System.out.println("Error in Searching ");
-        }
-    }
-    
-    public static void getupdateRecordbyID() throws IOException 
-    {
-        String newName, newAge, newAddr, record, ID = null,record2;
-     // String name;
-        File db = new File("Address_Book.txt");
-        File tempDB = new File("Address_Book_temp.txt");
-        BufferedWriter bw = null;
-        Scanner strInput = null;
-        try (BufferedReader br = new BufferedReader( new FileReader(db) ))
-        {
-            bw = new BufferedWriter( new FileWriter(tempDB) );
-            strInput = new Scanner(System.in);
-            System.out.println("\t\t Update Employee Record\n\n");
-            System.out.println("Enter the Employee ID: ");
-            ID = strInput.nextLine();
-     //     name = strInput.nextLine();
-            System.out.println(" ------------------------------------------------------------- ");
-            System.out.println("|	ID		Name 				Age			Address 		  |");
-            System.out.println(" ------------------------------------------------------------- ");
-            while( ( record = br.readLine() ) != null )
+
+	public void getSaveRecord() throws IOException
+	{
+            try (FileWriter writer = new FileWriter("Address_Book.txt")) 
             {
-                StringTokenizer st = new StringTokenizer(record,",");
-                if( record.contains(ID) )
+                for(int i=0; i<personArray.size(); i++)
                 {
-                    System.out.println("|	"+st.nextToken()+"	"+st.nextToken()+" 		"+st.nextToken()+"			"+st.nextToken()+"      |");
+                    writer.write(personArray.get(i).writePerson()+System.lineSeparator());
                 }
             }
-            System.out.println("|	                                            	          |");
-            System.out.println(" ------------------------------------------------------------- ");
-        }
-        catch (Exception e )
-        {
-            System.out.println("Id not found ");
-        }
-            
-        System.out.println("Enter the new Name: ");
-        newName = strInput.nextLine();    		
-        System.out.println("Enter the new Age: ");
-        newAge = strInput.nextLine();  
-        System.out.println("Enter the new Address: ");
-        newAddr = strInput.nextLine();  
-
-        BufferedReader br2 = new BufferedReader( new FileReader(db) );
-        while( (record2 = br2.readLine() ) != null ) 
-        {    			
-            if(record2.contains(ID))
+            catch (Exception ex)
             {
-                bw.write(ID+","+newName+","+newAge+","+newAddr);
+                System.out.print("Something is wrong in saving.");
             }
-            else
-            {
-                bw.write(record2);	
-            }    			
-            bw.flush();
-            bw.newLine();
-        }
-        bw.close();
-        br2.close();    		
-        db.delete();    		
-        boolean success = tempDB.renameTo(db);    		
-        System.out.println(success);    		
-
-    }
+	}
 }
